@@ -127,50 +127,52 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-  <script>
+  
+    
 
-    let normality_titrant; 
-    let volume_titrant; 
-    let vadded = 0; 
-    let normality_titrate = 1; 
-    let volume_titrate = 8; 
+    <script>
+    let normality_titrant;
+    let volume_titrant;
+    let vadded = 0;
+    let normality_titrate = 1;
+    let volume_titrate = 8;
 
     let equivalencePointVolume;
-    let titrationFinished = false; 
+    let titrationFinished = false;
 
-    let size; 
+    let size;
 
-    let shakingRotation = 0; 
-    let shakingRotationSpeed = 0.15; 
-    let flaskTouched = false; 
-    let bureteTouched = false; 
-    let liquidLevel; 
-    let buretteLiquidColor; 
+    let shakingRotation = 0;
+    let shakingRotationSpeed = 0.15;
+    let flaskTouched = false;
+    let bureteTouched = false;
+    let liquidLevel;
+    let buretteLiquidColor;
     let liquidDropInterval = 500;
-    let buretesize = 10;   
+    let buretesize = 10;
     let buretemainsize = 10;
 
     let flaskheight;
     let flaskwidth;
     let flaskX;
     let flaskY;
-    let cropHeight; 
+    let cropHeight;
 
-    let croppedImg; 
-    let gifImage; 
+    let croppedImg;
+    let gifImage;
     let bureteImg, flaskImg, bottomImg, backgroundImage, flaskImgbk;
 
     let changetint;
-    let initialColor, afterColor; 
-    let change; 
+    let initialColor, afterColor;
+    let change;
 
-    let buretetouchX = 10 * size;
-    let buretetouchY = 12.5 * size;
-    let flasktouchX = 9 * size;
-    let flasktouchY = 18.3 * size;
+    let buretetouchX;
+    let buretetouchY;
+    let flasktouchX;
+    let flasktouchY;
 
     let ex2one = false;
-    let exone = false; 
+    let exone = false;
 
     let darkness = 140;
 
@@ -178,7 +180,7 @@
 
     let onerun = true;
     let canvas;
-    let turnslideractive = true; 
+    let turnslideractive = true;
 
     let container;
     let waterlevel;
@@ -193,23 +195,18 @@
     let ppt = true;
     let nxtx, nxty, nxtw, nxth;
     let shownext = false;
-    let blinking = true;
-    let blinkInterval = 200;
-
 
     // --- Titration Control Variables ---
     let titrationRunning = false; // Flag to track if titration is running
     let titrationStartTime = 0; // To store the time when titration starts
+    let addLiquidDropInterval; // Global variable to store the interval ID
 
     function preload() {
       bureteImg = loadImage('burette51.png', loaded);
       flaskImgbk = loadImage('backflask.png', loaded);
       flaskImg = loadImage('frontflask.png', loaded);
       bottomImg = loadImage('water.png', loaded);
-      //   gifImage = createImg('bubbler1.gif', loaded);
-      nextimg = loadImage('Forward.png');
       backgroundImage = loadImage('bg.png', loaded);
-      // anothercolorImg=loadImage('conical flask.png')
     }
 
     let loadedImages = 0;
@@ -251,13 +248,13 @@
       normality_titrate = slider2.value() / 2;
       volume_titrate = slider3.value();
 
-      buretteLiquidColor = color(255, 255, 255, 100); 
-      liquidLevel = 8 * size;
+      buretteLiquidColor = color(255, 255, 255, 100);
+      liquidLevel = (8 * size);
       flaskheight = 5 * size / 1.1;
       flaskwidth = 3.9 * size / 1.1;
       flaskX = width / 2 - .7 * size;
       flaskY = height / 2 + 5.3 * size;
-      cropHeight = flaskheight - volume_titrate * 0.0675 * size; 
+      cropHeight = flaskheight - volume_titrate * 0.0675 * size;
       buretetouchX = 11 * size;
       buretetouchY = 13 * size;
       flasktouchX = 10.5 * size;
@@ -270,7 +267,7 @@
       changetint = initialColor;
 
       let startButton = document.getElementById("Start");
-      startButton.addEventListener("click", startTitration); // Use startTitration function
+      startButton.addEventListener("click", startTitration); 
       let resetButton = document.getElementById("Reset");
       resetButton.addEventListener("click", setup);
       let shakeButton = document.getElementById("Shake");
@@ -346,25 +343,24 @@
         setup();
         onerun = !onerun;
       }
-      if (shownext == true) {
-        if (millis() % (2 * blinkInterval) < blinkInterval) {
-          image(nextimg, nxtx, nxty, nxtw, nxth);
-        }
-      }
+      // if (shownext == true) {
+      //   // Display the button without blinking
+      //   image(nextimg, nxtx, nxty, nxtw, nxth);
+      // }
     }
 
     function mousePressed() {
       let dis_burete = dist(mouseX, mouseY, buretetouchX, buretetouchY);
       if (dis_burete <= 1.5 * size) {
-        startTitration(); // Use startTitration function
+        startTitration(); 
       }
       let dis_flask = dist(mouseX, mouseY, flasktouchX, flasktouchY);
       if (dis_flask <= 2.3 * size) {
         flaskTouched = !flaskTouched;
       }
-      if (mouseX > nxtx - nxtw / 4 && mouseX < nxtx + nxtw && mouseY > nxty - nxth / 4 && mouseY < nxty + nxth && vadded >= volume_titrant) {
-        nextpressed();
-      }
+      // if (mouseX > nxtx - nxtw / 4 && mouseX < nxtx + nxtw && mouseY > nxty - nxth / 4 && mouseY < nxty + nxth && vadded >= volume_titrant) {
+      //   nextpressed();
+      // }
     }
 
     function mouseReleased() {
@@ -373,25 +369,27 @@
 
     function addLiquidDrop() {
       if (!titrationRunning) {
-        return; // Stop adding drops if titration is not running
+        return; 
       }
 
       let runonce = true;
       if (liquidLevel >= 1 && bureteTouched == true) {
-        liquidLevel -= change * size / 5;
-        cropHeight -= 2.0 * change;
-        number += change;
-
-        vadded += 1 * change;
+    // Adjust this calculation based on your burette dimensions 
+    liquidLevel -= (change * size / 5) * (20/ 50); // Example: Assuming burette height is 40 pixels
+    cropHeight -= 2.0 * change;
+    number += change;
+    vadded =vadded+ 1* change;
+  
 
         if (vadded >= volume_titrant / 2) {
           changetint = afterColor;
         }
 
         if (vadded >= volume_titrant && runonce) {
-          console.log("change color");
+          console.log("Titration Complete!");
           shownext = true;
           runonce = false;
+          stopTitration();
         }
 
         if (darkness <= 255 && runonce == false) {
@@ -399,6 +397,15 @@
         }
       }
     }
+
+    function stopTitration() {
+        console.log("StopTitration() called"); // Debugging line
+  // 1. Stop adding drops (clearInterval)
+  clearInterval(addLiquidDropInterval); 
+  // 2. Set titrationRunning to false
+  titrationRunning = false; 
+  // 3. Any other visual or logical changes for the end of the titration 
+}
 
     function funflasktouched() {
       let shakingRotationOffset = sin(shakingRotation) * 6;
@@ -419,8 +426,9 @@
       pop();
       shakingRotation += shakingRotationSpeed;
     }
- 
+
     function startTitration() {
+        console.log("startTitration() called"); // Debugging line
       normality_titrate = slider2.value() / 2;
       volume_titrate = slider3.value();
       if (turnslideractive == true) {
@@ -441,16 +449,10 @@
       titrationStartTime = millis(); // Record the start time
 
       // Start adding drops
-      setInterval(addLiquidDrop, liquidDropInterval);
+      addLiquidDropInterval = setInterval(addLiquidDrop, liquidDropInterval); // Store interval ID
 
       slider2.attribute('disabled', true);
       slider3.attribute('disabled', true);
-
-      // --- Pause titration after 10 seconds ---
-      setTimeout(() => {
-        titrationRunning = false;
-        console.log("Titration paused after 10 seconds.");
-      }, 10000); // 10000 milliseconds = 10 seconds
     }
 
 
@@ -473,34 +475,35 @@
       }
     }
 
-    function nextpressed() {
-      const queryParams = `&data3=${encodeURIComponent(volume_titrant)}&data4=${encodeURIComponent(normality_titrant)}`;
-      fetch(`send.php?${queryParams}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error('Network response was not ok');
-          }
-        })
-        .then(data => {
-          console.log('Response from server (Page 1):', data);
-          if (data.message === 'Value received successfully (Page 2)') {
-            window.location.href = 'TitrationComp.php';
-          } else {
-            console.error('Unexpected server response:', data);
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
-    }
+    // function nextpressed() {
+    //   const queryParams = `&data3=${encodeURIComponent(volume_titrant)}&data4=${encodeURIComponent(normality_titrant)}`;
+    //   fetch(`send.php?${queryParams}`, {
+    //     method: 'GET',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //   })
+    //     .then(response => {
+    //       if (response.ok) {
+    //         return response.json();
+    //       } else {
+    //         throw new Error('Network response was not ok');
+    //       }
+    //     })
+    //     .then(data => {
+    //       console.log('Response from server (Page 1):', data);
+    //       if (data.message === 'Value received successfully (Page 2)') {
+    //         window.location.href = 'TitrationComp.php';
+    //       } else {
+    //         console.error('Unexpected server response:', data);
+    //       }
+    //     })
+    //     .catch(error => {
+    //       console.error('Error:', error);
+    //     });
+    // }
   </script>
+  </>
 
   <script>
     $(document).ready(function () {
