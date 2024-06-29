@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beaker Mixing Simulator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {cursor: url('gif1.gif'), auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 50vw;
+            height: 80vh;
+            background-image: url("bg3.png");
+            background-size: contain;
+            background-repeat: no-repeat;
+            position: relative;
+            left: 100px;
+        }
+
+        .beakers {
+            display: flex;
+            justify-content: space-between;
+            width: 250px;
+        }
+
+        .beaker {
+            width: 80px;
+            height: 150px;
+            border: 2px solid white;
+            border-radius: 0 0 20px 20px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 1s, opacity 1s;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+
+        .liquid {
+            width: 100%;
+            height: 50%;
+            position: absolute;
+            bottom: 0;
+            transition: height 1s;
+        }
+        
+
+
+        .yellow {
+            background-color: yellow;
+        }
+
+        .blue {
+            background-color: blue;
+        
+            
+        }
+
+        #mixedLiquid {
+            background-color: blue; /* Initially blue */
+            height: 30%; /* Pre-filled to a certain height */
+            transition: background-color 2s, height 2s; /* Transition for color change */
+        }
+
+        #mixButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 20px;
+            transition: opacity 1s;
+        }
+
+        .pour {
+            transform: rotate(-45deg) translateY(-50px);
+            transition: transform 1s;
+        }
+
+        .rotate-right {
+            transform: rotate(45deg);
+            transition: transform 1s;
+        }
+
+        .rotate-left {
+            transform: rotate(-45deg);
+            transition: transform 1s;
+        }
+
+        .revert {
+            transform: rotate(0deg) translateX(0) translateY(0);
+            transition: transform 1s;
+        }
+
+        #nextButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            transition: opacity 1s;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="beakers">
+            <div class="beaker" id="beaker1">
+                <div class="liquid yellow" id="yellowLiquid"></div>
+            </div>
+        </div>
+        <button id="mixButton">Mix</button>
+        <div class="beaker" id="beaker3">
+            <div class="liquid" id="mixedLiquid"></div>
+        </div>
+        <button id="nextButton">Next</button>
+    </div>
+
+    <script> let mixButton = document.getElementById('mixButton');
+        let beaker1 = document.getElementById('beaker1');
+        let mixedLiquid = document.getElementById('mixedLiquid');
+        let yellowLiquid = document.getElementById('yellowLiquid');
+        let nextButton = document.getElementById('nextButton');
+    
+        mixButton.addEventListener('click', function() {
+            beaker1.classList.remove('move'); 
+            beaker1.classList.add('rotate-right');
+    
+            setTimeout(() => {
+                // Change the color of the mixed liquid
+                mixedLiquid.style.backgroundColor = '#b08307'; 
+    
+                // Calculate new height (increase by 20%)
+                // let currentHeight = parseInt(mixedLiquid.style.height);
+                // let newHeight = currentHeight + (currentHeight * 0.20); 
+                // mixedLiquid.style.height = newHeight + '%';
+                mixedLiquid.style.height = '50%';
+
+    
+                yellowLiquid.style.height = '30%'; 
+    
+                setTimeout(() => {
+                    beaker1.classList.remove('rotate-right');
+                    mixButton.disabled = true;
+                    nextButton.style.display = 'block';
+                }, 2000); 
+            }, 1000); 
+        });
+    
+        nextButton.addEventListener('click', function() {
+            window.location.href = "index2.html"; 
+        });
+    </script>
+</body>
+</html>

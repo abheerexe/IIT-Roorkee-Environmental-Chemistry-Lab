@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Beaker Mixing Simulator - Next Page</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: black;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 50vw;
+        height: 80vh;
+        background-image: url("bg3.png");
+        background-color: white;
+        background-size: contain;
+        background-repeat: no-repeat;
+        position: relative;
+        left: 100px;
+      }
+
+      .beaker {
+        width: 60px; /* Reduced width */
+        height: 120px; /* Reduced height */
+        border: 2px solid white;
+        background-color: #fff;
+        border-radius: 0 0 20px 20px;
+        overflow: hidden;
+        position: relative;
+        transition: transform 1s, opacity 1s;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .liquid {
+        width: 100%;
+        height: 50%;
+        position: absolute;
+        bottom: 0;
+        transition: height 1s;
+      }
+
+      .purple {
+        background-color: #b08307;
+      }
+
+      /* Styles for the burette */
+      #burette {
+        width: 21px;
+        height: 219px;
+        border: 2px solid white;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+        background-color: #fff;
+        position: absolute;
+        top: 85px;
+        left: 202px;
+        display: block;
+        transition: opacity 1s;
+        z-index: 1;
+      }
+
+      #burette .liquid {
+        width: 100%;
+        height: 100%;
+        background-color: #2f2f2f;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+        position: absolute;
+        bottom: 0;
+        transition: height 1s;
+        height: var(--liquidHeight, 100%);
+      }
+
+      /* Button styles */
+      #startButton,
+      #fillButton,
+      #pauseButton,
+      #nextButton {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 20px;
+        border: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+        color: white; /* White text */
+      }
+
+      #startButton {
+        background-color: #4caf50; /* Green background */
+      }
+
+      #startButton:hover {
+        background-color: #3e8e41; /* Darker green on hover */
+      }
+
+      #fillButton {
+        background-color: #008cba; /* Blue background */
+      }
+
+      #fillButton:hover {
+        background-color: #007bff; /* Darker blue on hover */
+      }
+
+      #pauseButton {
+        background-color: #ffa500; /* Orange background */
+        display: none; /* Initially hidden */
+      }
+
+      #pauseButton:hover {
+        background-color: #ff8c00; /* Darker orange on hover */
+      }
+      #nextButton {
+        background-color: #167aa1; 
+        
+      }
+
+      #nextButton:hover {
+        background-color: #075664; 
+      }
+
+      /* Slider styles */
+      #speedSlider {
+        width: 200px;
+        margin-top: 20px;
+      }
+
+      #speedValue {
+        margin-left: 10px;
+      }
+
+      /* Style for the ml counter */
+      #mlCounter {
+        font-size: 18px;
+        margin-top: 10px;
+      }
+
+      /* Style for the PNG */
+      #burettePNG {
+        position: absolute;
+        top: 81px;
+        left: 13px;
+        width: 275px;
+        height: 418px;
+        z-index: 2;
+        background-size: cover;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .flask {
+        position: absolute;
+        top: 368px;
+        left: 170px;
+        width: 85px;
+        height: 110px;
+        z-index: 2;
+        background-size: cover;
+        display: block;
+        margin: 0 auto;
+        background-image: url("frontflask.png");
+        overflow: hidden; /* Hide overlay overflow */ 
+      }
+
+      .half-water {
+        background-image: url("Halfwater.png");
+        position: absolute;
+        top: 90px; 
+        left: 0;
+        width: 85px;
+        height: 18px; 
+        background-size: contain;
+        display: block;
+        z-index: 1;
+      }
+
+      /* Color overlay for changing the water color */
+      .flask .color-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%; 
+        mix-blend-mode: multiply;
+        display: none; /* Initially hidden */
+      } 
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Milliliter Counter -->
+      <div id="mlCounter">Liquid Poured: 0 ml</div>
+
+      <!-- Burette -->
+      <div id="burette">
+        <div class="liquid"></div>
+      </div>
+
+      <!-- Burette PNG -->
+      <img id="burettePNG" src="burette51.png" alt="Burette PNG" />
+
+      <!-- Conical flask -->
+      <div class="flask">
+        <div class="half-water"></div> 
+        <div class="color-overlay"></div> <div class="color-overlay"></div> 
+      </div>
+
+      <!-- Beaker -->
+      <div class="beaker" id="beaker">
+        <div class="liquid purple"></div>
+      </div>
+
+      <button id="fillButton">Fill</button>
+      <button id="nextButton">Titrate</button>
+    </div>
+
+    <script>
+      const burette = document.getElementById("burette");
+      const beaker = document.getElementById("beaker");
+      const fillButton = document.getElementById("fillButton");
+      const beakerLiquid = beaker.querySelector(".liquid");
+      const buretteLiquid = burette.querySelector(".liquid");
+      const colorOverlay = document.querySelector(".color-overlay"); 
+      const mlCounter = document.getElementById("mlCounter");
+      let mlPoured = 0;
+      let nextButton = document.getElementById('nextButton');
+
+      // Initial state: burette empty
+      buretteLiquid.style.height = "0%";
+
+      fillButton.addEventListener("click", () => {
+        // Reset beaker if it was previously used
+        beakerLiquid.style.height = "0%";
+        beaker.style.transform = "none"; 
+
+        // Fill the burette with animation
+        buretteLiquid.style.transitionDuration = `1000ms`; 
+        buretteLiquid.style.height = "100%"; 
+
+        // Change the half-water color using the overlay
+        colorOverlay.style.backgroundColor = "rgba(139, 69, 19, 0.7)"; 
+        colorOverlay.style.display = "block"; 
+      });
+
+      nextButton.addEventListener('click', function() {
+        window.location.href = "index3.html"; 
+      });
+    </script>
+  </body>
+</html>
